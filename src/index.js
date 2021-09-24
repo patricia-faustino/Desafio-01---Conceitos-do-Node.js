@@ -30,7 +30,7 @@ app.post("/users", (request, response) => {
   const userAlredyExists = users.some((users) => users.username === username);
 
   if (userAlredyExists) {
-    return response.status(400).json({ error: "User already Exists!" });
+    return response.status(404).json({ error: "User already Exists!" });
   }
 
   const user = {
@@ -46,11 +46,26 @@ app.post("/users", (request, response) => {
 });
 
 app.get("/todos", checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user } = request;
+
+  return response.json(user.todos);
 });
 
 app.post("/todos", checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { title, deadline } = request.body;
+  const { user } = request;
+
+  const todo = {
+    id: uuidv4(),
+    title,
+    done: false,
+    deadline: new Date(deadline),
+    created_at: new Date(),
+  };
+
+  user.todos.push(todo);
+
+  return response.status(201).json(todo);
 });
 
 app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
